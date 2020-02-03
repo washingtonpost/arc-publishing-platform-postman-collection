@@ -1,0 +1,1135 @@
+{
+	"info": {
+		"_postman_id": "6ab088c3-1aaf-4f7b-9d80-7126c1a1ae16",
+		"name": "Arc Publishing Draft API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Document Operations",
+			"item": [
+				{
+					"name": "Create Document",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "c7a9da79-0d5a-4a88-a7e8-d00588c5d1b8",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.id) {",
+									"    postman.setEnvironmentVariable(\"previousDocumentId\", postman.getEnvironmentVariable(\"latestDocumentId\"));",
+									"    postman.setEnvironmentVariable(\"latestDocumentId\", jsonData.id);",
+									"    postman.setEnvironmentVariable(\"latestRevisionId\", jsonData.draft_revision_id);",
+									"    ",
+									"    if(!postman.getEnvironmentVariable(\"previousDocumentId\")) {",
+									"        postman.setEnvironmentVariable(\"previousDocumentId\", postman.getEnvironmentVariable(\"latestDocumentId\"));",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "5d08dc6c-f2f2-46bd-869d-15d0efa43b5c",
+								"exec": [
+									"postman.setEnvironmentVariable(\"documentCreateCounter\", parseInt(postman.getEnvironmentVariable(\"documentCreateCounter\")) + 1);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"canonical_website\": \"{{defaultWebsite}}\",\n  \"headlines\": {\n    \"basic\": \"Test Document {{userId}} {{documentCreateCounter}}\"\n  },\n  \"owner\": {\n    \"id\": \"{{org}}\"\n  },\n  \"type\": \"story\",\n  \"version\": \"0.10.2\",\n  \"slug\": \"testDocument_{{userId}}_{{documentCreateCounter}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/story",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a Document",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "b6146f0e-b0a2-4e89-af3f-95a7e1d87e29",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.id) {",
+									"    postman.setEnvironmentVariable(\"latestDocumentId\", jsonData.id);",
+									"}",
+									"",
+									"if(jsonData.draft_revision_id) {",
+									"    postman.setEnvironmentVariable(\"latestDraftRevisionId\", jsonData.draft_revision_id);",
+									"}",
+									"",
+									"if(jsonData.published_revision_id) {",
+									"    postman.setEnvironmentVariable(\"latestPublishedRevisionId\", jsonData.published_revision_id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Publish a Document",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/revision/published",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"revision",
+								"published"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a Document's Revisions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/revision",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"revision"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Retrieve a Document's Revision",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/revision/{{latestDraftRevisionId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"revision",
+								"{{latestDraftRevisionId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Document's Draft Revision",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "726147b7-4d02-40fc-9211-3e5bf316c65a",
+								"exec": [
+									"postman.setEnvironmentVariable(\"draftRevisionUpdateCounter\", parseInt(postman.getEnvironmentVariable(\"draftRevisionUpdateCounter\")) + 1);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "54ab742a-fcf9-49a8-a069-43432e8566fd",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.id) {",
+									"    postman.setEnvironmentVariable(\"latestDraftRevisionId\", jsonData.id);    ",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"document_id\": \"{{latestDocumentId}}\",\n    \"ans\": {\n        \"_id\": \"{{latestDocumentId}}\",\n        \"canonical_website\": \"{{defaultWebsite}}\",\n        \"headlines\": {\n            \"basic\": \"Test Document Update {{draftRevisionUpdateCounter}}\"\n        },\n        \"owner\": {\n            \"id\": \"{{org}}\"\n        },\n        \"slug\": \"testDocumentUpdate{{draftRevisionUpdateCounter}}\",\n        \"type\": \"story\",\n        \"version\": \"0.10.2\"\n    },\n    \"type\": \"DRAFT\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/revision/draft",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"revision",
+								"draft"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unpublish a Document",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/revision/published",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"revision",
+								"published"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Revert a Document's Draft Revision",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/revision/revert",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"revision",
+								"revert"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Retrieve Revisions",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/pubstack/v1/bulk-fetch/revision?revision_type=DRAFT&document_id={{latestDocumentId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"pubstack",
+								"v1",
+								"bulk-fetch",
+								"revision"
+							],
+							"query": [
+								{
+									"key": "revision_type",
+									"value": "DRAFT"
+								},
+								{
+									"key": "document_id",
+									"value": "{{latestDocumentId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Circulation Operations",
+			"item": [
+				{
+					"name": "List a Document's Circulations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/circulation",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"circulation"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Circulate a Document - Set URL",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "7404eb1e-eaba-44f8-8d1d-7293665380b3",
+								"exec": [
+									"postman.setEnvironmentVariable(\"circulationCounter\", parseInt(postman.getEnvironmentVariable(\"circulationCounter\")) + 1);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"website_url\": \"/test/{{userId}}/{{circulationCounter}}\",\n  \"website_primary_section\": {\n    \"type\": \"reference\",\n    \"referent\": {\n      \"type\": \"section\",\n      \"id\": \"/pets\",\n      \"website\": \"{{websiteId2}}\"\n    }\n  },\n  \"website_sections\": [\n    {\n      \"type\": \"reference\",\n      \"referent\": {\n        \"type\": \"section\",\n        \"id\": \"/pets\",\n        \"website\": \"{{websiteId2}}\"\n      }\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/circulation/{{websiteId2}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"circulation",
+								"{{websiteId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Circulate a Document - Generate URL",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"website_url\": \"\",\n  \"website_primary_section\": {\n    \"type\": \"reference\",\n    \"referent\": {\n      \"type\": \"section\",\n      \"id\": \"/pets\",\n      \"website\": \"{{websiteId2}}\"\n    }\n  },\n  \"website_sections\": [\n    {\n      \"type\": \"reference\",\n      \"referent\": {\n        \"type\": \"section\",\n        \"id\": \"/pets\",\n        \"website\": \"{{websiteId2}}\"\n      }\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/circulation/{{websiteId2}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"circulation",
+								"{{websiteId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Decirculate a Document",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/circulation/{{websiteId2}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"circulation",
+								"{{websiteId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a Document's Circulation",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/circulation/{{websiteId2}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"circulation",
+								"{{websiteId2}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "Redirect Operations",
+			"item": [
+				{
+					"name": "List a Document's Redirects",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/story/{{latestDocumentId}}/redirect/{{websiteId2}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"story",
+								"{{latestDocumentId}}",
+								"redirect",
+								"{{websiteId2}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a Redirect - External",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "68b95be6-9c39-4c7b-98af-c877aa6bb58d",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.website_url) {",
+									"    postman.setEnvironmentVariable(\"latestExternalRedirectUrl\", jsonData.website_url.replace(/^\\/+/, ''));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId1}}/{{latestExternalRedirectUrl}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId1}}",
+								"{{latestExternalRedirectUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Fetch a Redirect - Document",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "55262e71-efa5-46a5-8417-25ee380c5205",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.website_url) {",
+									"    postman.setEnvironmentVariable(\"latestDocumentRedirectUrl\", jsonData.website_url.replace(/^\\/+/, ''));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId2}}/{{latestDocumentRedirectUrl}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId2}}",
+								"{{latestDocumentRedirectUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a Redirect - External",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0a60fb73-6099-4ff0-919a-005d4fa94bfe",
+								"exec": [
+									"let urlParts = postman.getEnvironmentVariable(\"latestExternalRedirectUrl\").split(\"/\");",
+									"urlParts[2] = parseInt(urlParts[2]) + 1;",
+									"postman.setEnvironmentVariable(\"latestExternalRedirectUrl\", urlParts.join(\"/\"));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c3282261-f75d-4468-be59-5f0bd44b4d0d",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.website_url) {",
+									"    postman.setEnvironmentVariable(\"latestExternalRedirectUrl\", jsonData.website_url.replace(/^\\/+/, ''));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"redirect_to\": \"https://moz.com/learn/seo/redirection/{{userId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId1}}/{{userId}}/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId1}}",
+								"{{userId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a Redirect - Document",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "0a60fb73-6099-4ff0-919a-005d4fa94bfe",
+								"exec": [
+									"let urlParts = postman.getEnvironmentVariable(\"latestDocumentRedirectUrl\").split(\"/\");",
+									"urlParts[2] = parseInt(urlParts[2]) + 1;",
+									"postman.setEnvironmentVariable(\"latestDocumentRedirectUrl\", urlParts.join(\"/\"));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "806d67bd-5f0b-4cb3-865d-2fb1bc8334bc",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.website_url) {",
+									"    postman.setEnvironmentVariable(\"latestDocumentRedirectUrl\", jsonData.website_url.replace(/^\\/+/, ''));",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"document_id\": \"{{latestDocumentId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId2}}/{{userId}}/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId2}}",
+								"{{userId}}",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Redirect - External",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"redirect_to\": \"https://moz.com/learn/seo/redirection/{{userId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId1}}/{{latestExternalRedirectUrl}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId1}}",
+								"{{latestExternalRedirectUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Redirect - Document",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"document_id\": \"{{latestDocumentId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId1}}/{{latestDocumentRedirectUrl}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId1}}",
+								"{{latestDocumentRedirectUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a Redirect - External",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId1}}/{{latestExternalRedirectUrl}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId1}}",
+								"{{latestExternalRedirectUrl}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete a Redirect - Document",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/redirect/{{websiteId2}}/{{latestDocumentRedirectUrl}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"redirect",
+								"{{websiteId2}}",
+								"{{latestDocumentRedirectUrl}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "URL Format Rules Operations",
+			"item": [
+				{
+					"name": "List URL Format Rules",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/url-format-rule/{{websiteId1}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"url-format-rule",
+								"{{websiteId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create an URL Format Rule",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "8d2279f5-b679-485c-aee0-1a3c9e83c65c",
+								"exec": [
+									"postman.setEnvironmentVariable(\"formatCounter\", parseInt(postman.getEnvironmentVariable(\"formatCounter\")) + 1);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "a33e53f4-8c9e-406b-9b23-e0b83402d411",
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"",
+									"if(jsonData.id) {",
+									"    postman.setEnvironmentVariable(\"latestFormatId\", jsonData.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							},
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{userId}}{{formatCounter}}\",\n  \"format\": \"%publish_date|year()%/%publish_date|month()%/%publish_date|day()%/%headlines.basic|slugify()%\",\n  \"priority\": 9999999999,\n  \"criteria\": {\n    \"type\": \"story\"\n  }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/draft/v1/url-format-rule/{{websiteId1}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"url-format-rule",
+								"{{websiteId1}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete an URL Format Rule",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "{{arcOrgHeaderName}}",
+								"value": "{{arcOrgHeaderValue}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{host}}/draft/v1/url-format-rule/{{websiteId1}}/{{latestFormatId}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"draft",
+								"v1",
+								"url-format-rule",
+								"{{websiteId1}}",
+								"{{latestFormatId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "caf76076-665a-4059-9499-8f85dd23fc4d",
+				"type": "text/javascript",
+				"exec": [
+					"let host = pm.environment.get(\"host\");",
+					"pm.environment.set(\"arcOrgHeaderName\", \"Arc-Org-Name\");",
+					"pm.environment.set(\"arcOrgHeaderValue\", pm.environment.get(\"org\"));",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "23fcd904-7d76-40dc-8a04-b9a3f4f6383c",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

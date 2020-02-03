@@ -1,4 +1,4 @@
-## Arc Publishing Platform Postman collection
+## Arc Publishing Platform Postman Collection
 
 This repo contains the Postman collection with pre-baked calls to the Arc Publishing Platform. For now, this includes all endpoints available as part of the Draft API.
 
@@ -17,6 +17,7 @@ Next, set the following variables in the Environment, which will be used across 
 5. `websiteId1` - the id of a website to test circulating to and from
 6. `websiteId2` - the id of a website to test circulating to and from
 
+The `org` variable will be used in the `host` variable in order to set the appropriate URL for your testing. The collection defaults to using sandbox. 
 
 ### How the Collection Works:
 
@@ -32,7 +33,7 @@ All of these auto-filling variables make using the Collection easier, but feel f
 
 ### Maintaining this Collection:
 
-The Team behind the Arc Publishing Platform (Draft API) will be periodically updating this repo with new features, endpoints, or documentation, in order to keep it up to date with the latest version of the Publishing Platform. If you find an error in the collection, please feel free to submit a PR and help us keep this maintained for everyone. 
+The Team behind the Arc Publishing Platform (Draft API) will be periodically updating this repo with new features, endpoints, or documentation, in order to keep it up to date with the latest version of the Publishing Platform. If you find an error in the collection, please feel free to submit a PR and help us keep this maintained for everyone.
 
 ### Supporting Documentation:
 
